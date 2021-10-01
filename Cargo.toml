@@ -7,4 +7,6 @@ edition = "2018"
 
 [dependencies]
 structopt = "0.3.13"
-regex = "1"
+fancy-regex = "0.7.1"
+walkdir = "2"
+colored = "2"
