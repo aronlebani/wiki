@@ -20,12 +20,6 @@ struct Opt {
 
     #[structopt(short = "a", long = "anchor")]
     anchor: bool,
-
-    #[structopt(short = "l", long = "list")]
-    list: bool,
-
-    #[structopt(short = "v", long = "validate")]
-    validate: bool,
 }
 
 fn get_re(opt: Opt) -> Regex {
@@ -50,8 +44,6 @@ fn get_re(opt: Opt) -> Regex {
     if opt.check {
         re_str = format!("- \\[ \\]{}", re_str);
     }
-
-    println!("{}", re_str);
 
     Regex::new(&re_str).unwrap()
 }
@@ -100,21 +92,7 @@ fn query(opt: Opt) -> () {
         .for_each(|e| parse_file(e));
 }
 
-fn list(opt: Opt) -> () {
-
-}
-
-fn validate(opt: Opt) -> () {
-}
-
 fn main() {
     let opt = Opt::from_args();
-
-    if opt.list {
-        list(opt);
-    } else if opt.validate {
-        validate(opt);
-    } else {
-        query(opt);
-    };
+    query(opt);
 }

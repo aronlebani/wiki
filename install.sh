@@ -1,13 +1,16 @@
 #!/bin/bash
 
-if [ -z "$1" ]; then
-    echo "Usage: ./install.sh <path>"
-fi
+EXE="./target/debug/query";
+DEST="$HOME/bin";
 
-if [ -f "./target/debug/query" ]; then
-    cp ./target/debug/query $1/q
-    echo "Installation successful!"
-else
+if [ ! -f "$EXE" ]; then
     echo "Error: Could not find executable"
+    exit 1
 fi
 
+if [ ! -d "$DEST" ]; then
+    mkdir -p "$DEST"
+fi
+
+cargo build && cp "$EXE" "$DEST/q"
+echo "Installation successful!"
