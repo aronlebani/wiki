@@ -9,16 +9,16 @@ use colored::Colorize;
 
 #[derive(Debug, StructOpt)]
 struct Opt {
-    #[structopt(short = "t", long = "tags", default_value = "")]
+    #[structopt(short = "t", long = "tags", default_value = "", help = "List of tags to query")]
     tags: String,
 
-    #[structopt(short = "q", long = "query", default_value = "")]
+    #[structopt(short = "q", long = "query", default_value = "", help = "Arbitrary query string")]
     query: String,
 
-    #[structopt(short = "c", long = "check")]
+    #[structopt(short = "c", long = "check", help = "Include only unchecked checkbox items")]
     check: bool,
 
-    #[structopt(short = "a", long = "anchor")]
+    #[structopt(short = "a", long = "anchor", help = "Include only links")]
     anchor: bool,
 }
 
