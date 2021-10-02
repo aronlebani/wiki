@@ -119,6 +119,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a2a5ac8f984bfcf3a823267e5fde638acc3325f6496633a5da6bb6eb2171e103"
 
 [[package]]
+name = "md-query"
+version = "0.1.0"
+dependencies = [
+ "colored",
+ "fancy-regex",
+ "structopt",
+ "walkdir",
+]
+
+[[package]]
 name = "memchr"
 version = "2.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -155,16 +165,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b9f5105d4fdaab20335ca9565e106a5d9b82b6219b5ba735731124ac6711d23d"
 dependencies = [
  "unicode-xid",
-]
-
-[[package]]
-name = "query"
-version = "0.1.0"
-dependencies = [
- "colored",
- "fancy-regex",
- "structopt",
- "walkdir",
 ]
 
 [[package]]
