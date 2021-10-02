@@ -48,8 +48,10 @@ fn get_re(opt: Opt) -> Regex {
     }
 
     if opt.check {
-        re_str = format!("- [ ]{}", re_str);
+        re_str = format!("- \\[ \\]{}", re_str);
     }
+
+    println!("{}", re_str);
 
     Regex::new(&re_str).unwrap()
 }
@@ -69,11 +71,11 @@ fn query(opt: Opt) -> () {
     };
 
     let print_match = |path: &str, line_no: &str, line: &str| -> () {
-        println!("{}:{}: {}", path.green(), line_no.blue(), line);
+        println!("{}:{}: {}", path.green(), line_no.cyan(), line);
     };
 
     let parse_line = |path: &Path, line_no: u8, line: &str| -> () {
-        let is_match = re.is_match(line).unwrap();    
+        let is_match = re.is_match(line).unwrap(); 
         match is_match {
             true => print_match(path.to_str().unwrap(), &format!("{}", line_no), line),
             false => (),
@@ -107,7 +109,6 @@ fn validate(opt: Opt) -> () {
 
 fn main() {
     let opt = Opt::from_args();
-    println!("{:?}", opt);
 
     if opt.list {
         list(opt);
@@ -115,5 +116,5 @@ fn main() {
         validate(opt);
     } else {
         query(opt);
-    }
+    };
 }
