@@ -57,5 +57,6 @@ README.md:10: - [ ] Unchecked todo items
 ## TODO
 
 - [ ] Add config variable to choose editor
-- [ ] wiki init
+- [ ] init
 - [ ] List of recommended vim extensions
+- [ ] Generalise filename rather than using memo and todo

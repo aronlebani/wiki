@@ -47,7 +47,7 @@ fn get_re(opt: Query) -> Regex {
 
     if opt.tags != "" {
         for tag in opt.tags.split(" ") {
-            re_str = format!("{}(?=.*_{}[^_]*_)", re_str, tag);
+            re_str = format!("{}(?=.* _{}[^_]*_)", re_str, tag);
         }
     }
 
