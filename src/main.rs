@@ -69,7 +69,7 @@ fn get_re(opt: Query) -> Regex {
 
     if opt.query != "" {
         for keyword in opt.query.split(" ") {
-            re_str = format!("{}(?=.*{}*)", re_str, keyword);
+            re_str = format!("{}(?i)(?=.*{}*)", re_str, keyword);
         }
     }
 
