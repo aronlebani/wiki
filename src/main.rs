@@ -3,11 +3,27 @@ use std::fs::File;
 use std::path::Path;
 use std::io::{BufRead, BufReader};
 use std::process::Command;
+use std::default::Default;
+use serde::{Deserialize};
 use walkdir::{WalkDir, DirEntry};
 use fancy_regex::Regex;
 use structopt::StructOpt;
 use colored::Colorize;
 use chrono::offset::Local;
+use toml;
+
+#[derive(Debug, Deserialize)]
+struct Cfg {
+    path: String,
+    editor: String,
+}
+
+impl Default for Cfg {
+    fn default() -> Self {
+        let home = std::env::var("HOME").unwrap();
+        Self { path: home, editor: "vim".to_string() }
+    }
+}
 
 #[derive(Debug, StructOpt)]
 enum Opt {
@@ -68,7 +84,7 @@ fn get_re(opt: Query) -> Regex {
     Regex::new(&re_str).unwrap()
 }
 
-fn query(opt: Query) -> () {
+fn query(opt: Query, cfg: Cfg) -> () {
     let re = get_re(opt);
 
     let is_file = |entry: &DirEntry| -> bool {
@@ -104,9 +120,7 @@ fn query(opt: Query) -> () {
             .for_each(|(line_no, line)| parse_line(path, line_no as u8, &line.unwrap()));
     };
 
-    let path = "/Users/aron/Dropbox/Wiki";
-
-    WalkDir::new(path)
+    WalkDir::new(cfg.path)
             .into_iter()
             .filter_map(|e| e.ok())
             .filter(|e| is_file(e))
@@ -114,13 +128,13 @@ fn query(opt: Query) -> () {
             .for_each(|e| parse_file(e));
 }
 
-fn memo(opt: Memo, path: String) {
-    let full_path = format!("{}memo.md", path);
+fn memo(opt: Memo, cfg: Cfg) {
 
     if opt.new {
         let date = Local::now();
         let heading = date.format("\n## [%d-%m-%Y]\n").to_string();
-        let cmd = format!("echo \"{}\" >> {} && vim {}", heading, full_path, full_path);
+        let full_path = format!("{}memo.md", cfg.path);
+        let cmd = format!("echo \"{}\" >> {} && cd {} && {} memo.md", heading, full_path, cfg.path, cfg.editor);
 
         Command::new("sh")
                 .arg("-c")
@@ -130,7 +144,7 @@ fn memo(opt: Memo, path: String) {
                 .wait()
                 .expect("Error: Editor returned a non-zero status");
     } else {
-        let cmd = format!("vim {}", full_path);
+        let cmd = format!("cd {} && {} memo.md", cfg.path, cfg.editor);
 
         Command::new("sh")
                 .arg("-c")
@@ -142,9 +156,8 @@ fn memo(opt: Memo, path: String) {
     }
 }
 
-fn todo(path: String) {
-    let full_path = format!("{}todo.md", path);
-    let cmd = format!("vim {}", full_path);
+fn todo(cfg: Cfg) {
+    let cmd = format!("cd {} && {} todo.md", cfg.path, cfg.editor);
 
     Command::new("sh")
             .arg("-c")
@@ -155,22 +168,21 @@ fn todo(path: String) {
             .expect("Error: Editor returned a non-zero status");
 }
 
-fn get_config() -> String {
+fn get_config() -> Cfg {
     let home = std::env::var("HOME").unwrap();
     let config_path = format!("{}/.wiki", home);
+    let config_content = std::fs::read_to_string(config_path).expect("Error reading config file");
 
-    std::fs::read_to_string(config_path)
-        .expect("Error: Could not read file")
-        .replace("\n", "")
+    toml::from_str(&*config_content).expect("Error parsing config file")
 }
 
 fn main() {
     let opt = Opt::from_args();
-    let config = get_config();
+    let cfg = get_config();
 
     match opt {
-        Opt::Query(opt) => query(opt),
-        Opt::Memo(opt) => memo(opt, config),
-        Opt::Todo => todo(config),
+        Opt::Query(opt) => query(opt, cfg),
+        Opt::Memo(opt) => memo(opt, cfg),
+        Opt::Todo => todo(cfg),
     };
 }
