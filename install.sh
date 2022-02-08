@@ -13,5 +13,5 @@ if [ ! -d "$DEST" ]; then
     exit 1
 fi
 
-cargo build && cp "$EXE" "$DEST/q"
+cargo build && cp "$EXE" "$DEST/wiki"
 echo "Installation successful!"
