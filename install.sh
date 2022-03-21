@@ -1,6 +1,6 @@
 #!/bin/bash
 
-EXE="./target/debug/md-query";
+EXE="./target/debug/wiki";
 DEST="/usr/local/bin";
 
 if [ ! -f "$EXE" ]; then

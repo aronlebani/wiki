@@ -1,4 +1,4 @@
-# md-query
+# wiki
 
 > Recursively query Markdown notes
 

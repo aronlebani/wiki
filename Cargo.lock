@@ -138,19 +138,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a2a5ac8f984bfcf3a823267e5fde638acc3325f6496633a5da6bb6eb2171e103"
 
 [[package]]
-name = "md-query"
-version = "0.1.0"
-dependencies = [
- "chrono",
- "colored",
- "fancy-regex",
- "serde",
- "structopt",
- "toml",
- "walkdir",
-]
-
-[[package]]
 name = "memchr"
 version = "2.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -379,6 +366,19 @@ name = "wasi"
 version = "0.10.0+wasi-snapshot-preview1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1a143597ca7c7793eff794def352d41792a93c481eb1042423ff7ff72ba2c31f"
+
+[[package]]
+name = "wiki"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "colored",
+ "fancy-regex",
+ "serde",
+ "structopt",
+ "toml",
+ "walkdir",
+]
 
 [[package]]
 name = "winapi"
