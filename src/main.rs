@@ -35,12 +35,26 @@ enum Opt {
 
     #[structopt(help = "Query items in wiki")]
     Query(Query),
+
+    #[structopt(help = "Go to line in file")]
+    Go(Go),
+
+    #[structopt(help = "Open home")]
+    Home
 }
 
 #[derive(Debug, StructOpt)]
 struct Memo {
     #[structopt(short, long, help = "Create new item")]
     new: bool,
+}
+#[derive(Debug, StructOpt)]
+struct Go {
+    #[structopt(short, long, help = "File path")]
+    file: String,
+
+    #[structopt(short, long, help = "Line number")]
+    line: String,
 }
 
 #[derive(Debug, StructOpt)]
@@ -56,6 +70,16 @@ struct Query {
 
     #[structopt(short, long, help = "Include only links")]
     anchor: bool,
+}
+
+fn execute(cmd: String) {
+    Command::new("sh")
+        .arg("-c")
+        .arg(cmd)
+        .spawn()
+        .expect("Error: Failed to run editor")
+        .wait()
+        .expect("Error: Editor returned a non-zero status");
 }
 
 fn get_re(opt: Query) -> Regex {
@@ -84,6 +108,14 @@ fn get_re(opt: Query) -> Regex {
     Regex::new(&re_str).unwrap()
 }
 
+fn pad(string: String, chars: u8) -> Result<String, String> {
+    match string.chars().count() {
+        x if x as u8 > chars => Err(string),
+        x if x as u8 == chars => Ok(string),
+        _ => pad(format!("{} ", string), chars),
+    }
+}
+
 fn query(opt: Query, cfg: Cfg) -> () {
     let re = get_re(opt);
 
@@ -99,7 +131,7 @@ fn query(opt: Query, cfg: Cfg) -> () {
     };
 
     let print_match = |path: &str, line_no: &str, line: &str| -> () {
-        println!("{}:{}: {}", path.green(), line_no.cyan(), line);
+        println!("{}:{}: {}", path.green(), pad(String::from(line_no), 4).unwrap().cyan(), line);
     };
 
     let parse_line = |path: &Path, line_no: u8, line: &str| -> () {
@@ -115,57 +147,51 @@ fn query(opt: Query, cfg: Cfg) -> () {
         let file = File::open(&path).unwrap();
         let reader = BufReader::new(file);
 
-        reader.lines()
+        reader
+            .lines()
             .enumerate()
             .for_each(|(line_no, line)| parse_line(path, line_no as u8, &line.unwrap()));
     };
 
     WalkDir::new(cfg.path)
-            .into_iter()
-            .filter_map(|e| e.ok())
-            .filter(|e| is_file(e))
-            .filter(|e| is_markdown(e))
-            .for_each(|e| parse_file(e));
+        .into_iter()
+        .filter_map(|e| e.ok())
+        .filter(|e| is_file(e))
+        .filter(|e| is_markdown(e))
+        .for_each(|e| parse_file(e));
 }
 
 fn memo(opt: Memo, cfg: Cfg) {
-
     if opt.new {
         let date = Local::now();
         let heading = date.format("\n## [%d-%m-%Y]\n").to_string();
         let full_path = format!("{}memo.md", cfg.path);
         let cmd = format!("echo \"{}\" >> {} && cd {} && {} memo.md", heading, full_path, cfg.path, cfg.editor);
 
-        Command::new("sh")
-                .arg("-c")
-                .arg(cmd)
-                .spawn()
-                .expect("Error: Failed to run editor")
-                .wait()
-                .expect("Error: Editor returned a non-zero status");
+        execute(cmd);
     } else {
         let cmd = format!("cd {} && {} memo.md", cfg.path, cfg.editor);
 
-        Command::new("sh")
-                .arg("-c")
-                .arg(cmd)
-                .spawn()
-                .expect("Error: Failed to run editor")
-                .wait()
-                .expect("Error: Editor returned a non-zero status");
-    }
+        execute(cmd);
+    };
 }
 
 fn todo(cfg: Cfg) {
     let cmd = format!("cd {} && {} todo.md", cfg.path, cfg.editor);
 
-    Command::new("sh")
-            .arg("-c")
-            .arg(cmd)
-            .spawn()
-            .expect("Error: Failed to run editor")
-            .wait()
-            .expect("Error: Editor returned a non-zero status");
+    execute(cmd);
+}
+
+fn home(cfg: Cfg) {
+    let cmd = format!("cd {} && {} index.md", cfg.path, cfg.editor);
+
+    execute(cmd);
+}
+
+fn go(opt: Go, cfg: Cfg) {
+    let cmd = format!("cd {} && {} +{} {}", cfg.path, cfg.editor, opt.line, opt.file);
+
+    execute(cmd);
 }
 
 fn get_config() -> Cfg {
@@ -184,5 +210,7 @@ fn main() {
         Opt::Query(opt) => query(opt, cfg),
         Opt::Memo(opt) => memo(opt, cfg),
         Opt::Todo => todo(cfg),
+        Opt::Go(opt) => go(opt, cfg),
+        Opt::Home => home(cfg),
     };
 }
