@@ -33,6 +33,9 @@ enum Opt {
     #[structopt(help = "Open todo")]
     Todo,
 
+    #[structopt(help = "Open notes")]
+    Notes,
+
     #[structopt(help = "Query items in wiki")]
     Query(Query),
 
@@ -48,6 +51,7 @@ struct Memo {
     #[structopt(short, long, help = "Create new item")]
     new: bool,
 }
+
 #[derive(Debug, StructOpt)]
 struct Go {
     #[structopt(short, long, help = "File path")]
@@ -182,6 +186,12 @@ fn todo(cfg: Cfg) {
     execute(cmd);
 }
 
+fn notes(cfg: Cfg) {
+    let cmd = format!("cd {}notes && {} .", cfg.path, cfg.editor);
+
+    execute(cmd);
+}
+
 fn home(cfg: Cfg) {
     let cmd = format!("cd {} && {} index.md", cfg.path, cfg.editor);
 
@@ -210,6 +220,7 @@ fn main() {
         Opt::Query(opt) => query(opt, cfg),
         Opt::Memo(opt) => memo(opt, cfg),
         Opt::Todo => todo(cfg),
+        Opt::Notes => notes(cfg),
         Opt::Go(opt) => go(opt, cfg),
         Opt::Home => home(cfg),
     };
