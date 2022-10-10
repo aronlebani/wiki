@@ -19,7 +19,12 @@ Markdown `_italic_` syntax is borrowed to allow custom tagging of notes with aut
 1. Ensure you have the Rust compiler installed
 2. Clone repository
 3. Run `./install.sh` inside the repository directory
-4. Create a file called `.wiki` in your home directory containing the absolute path to your wiki directory
+4. Create a file called `.wiki` in your home directory such as:
+
+```
+editor="vim"
+path="/home/aron/wiki/"
+```
 
 ## Usage
 
