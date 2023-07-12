@@ -39,6 +39,9 @@ enum Opt {
     #[structopt(help = "Query items in wiki")]
     Query(Query),
 
+    #[structopt(help = "List tags")]
+    Tags,
+
     #[structopt(help = "Go to line in file")]
     Go(Go),
 
@@ -165,6 +168,52 @@ fn query(opt: Query, cfg: Cfg) -> () {
         .for_each(|e| parse_file(e));
 }
 
+fn tags(cfg: Cfg) -> () {
+    let re_str = "_[^_]*_";
+    let re = Regex::new(&re_str).unwrap();
+
+    let is_file = |entry: &DirEntry| -> bool {
+        entry.path().is_file()
+    };
+
+    let is_markdown = |entry: &DirEntry| -> bool {
+        match entry.path().extension() {
+            Some(ext) => ext == "md",
+            _ => false,
+        }
+    };
+
+    let print_match = |line: &str| -> () {
+        println!("{}", line);
+    };
+
+    let parse_line = |line: &str| -> () {
+        let is_match = re.is_match(line).unwrap(); 
+        match is_match {
+            true => print_match(line),
+            false => (),
+        }
+    };
+
+    let parse_file = |entry: DirEntry| -> () {
+        let path = entry.path();
+        let file = File::open(&path).unwrap();
+        let reader = BufReader::new(file);
+
+        reader
+            .lines()
+            .enumerate()
+            .for_each(|(_, line)| parse_line(&line.unwrap()));
+    };
+
+    WalkDir::new(cfg.path)
+        .into_iter()
+        .filter_map(|e| e.ok())
+        .filter(|e| is_file(e))
+        .filter(|e| is_markdown(e))
+        .for_each(|e| parse_file(e));
+}
+
 fn memo(opt: Memo, cfg: Cfg) {
     if opt.new {
         let date = Local::now();
@@ -223,5 +272,6 @@ fn main() {
         Opt::Notes => notes(cfg),
         Opt::Go(opt) => go(opt, cfg),
         Opt::Home => home(cfg),
+        Opt::Tags => tags(cfg),
     };
 }
