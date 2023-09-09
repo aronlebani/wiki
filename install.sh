@@ -1,7 +1,7 @@
 #!/bin/bash
 
 EXE="./target/debug/wiki";
-DEST="/usr/local/bin";
+DEST="$HOME/bin";
 
 if [ ! -f "$EXE" ]; then
     echo "Error: Could not find executable"
