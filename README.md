@@ -19,7 +19,7 @@ Markdown `_italic_` syntax is borrowed to allow custom tagging of notes with aut
 1. Ensure you have the Rust compiler installed
 2. Clone repository
 3. Run `./install.sh` inside the repository directory
-4. Create a file called `.wiki` in your home directory such as:
+4. Create a file `~/.config/wiki/config` with the following contents as an example
 
 ```
 editor="vim"
@@ -29,19 +29,19 @@ path="/home/aron/wiki/"
 ## Usage
 
 ```
-q [FLAGS] [OPTIONS]
+wiki [FLAGS] [OPTIONS]
 ```
 
 For full usage, run:
 ```
-q --help
+wiki --help
 ```
 
 ## Examples
 
 Query all lines with the tags `_tag_` and `_markdown_`: 
 ```
-q -t 'tag markdown'
+wiki query -t 'tag markdown'
 ```
 
 Output:
@@ -51,17 +51,10 @@ README.md:12: Lines with a custom _tag_ using _markdown_ italic syntax
 
 Query all pending todo items which contain the string `unchecked`:
 ```
-q -c -q 'unchecked'
+wiki query -c -q 'unchecked'
 ```
 
 Output:
 ```
 README.md:10: - [ ] Unchecked todo items
 ```
-
-## TODO
-
-- [ ] Add config variable to choose editor
-- [ ] init
-- [ ] List of recommended vim extensions
-- [ ] Generalise filename rather than using memo and todo

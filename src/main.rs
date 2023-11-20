@@ -206,7 +206,7 @@ fn go(opt: Go, cfg: Cfg) {
 
 fn get_config() -> Cfg {
     let home = std::env::var("HOME").unwrap();
-    let config_path = format!("{}/.wiki", home);
+    let config_path = format!("{}/.config/wiki/config", home);
     let config_content = std::fs::read_to_string(config_path).expect("Error reading config file");
 
     toml::from_str(&*config_content).expect("Error parsing config file")
